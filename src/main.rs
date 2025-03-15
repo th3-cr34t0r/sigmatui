@@ -5,7 +5,7 @@ use std::{cell::RefCell, io, rc::Rc};
 
 use ratzilla::ratatui::{
     layout::{Alignment, Rect},
-    style::{Color, Style},
+    style::{Color, Style, Stylize},
     widgets::{Block, List, ListItem, ListState, Paragraph, StatefulWidget},
     Frame, Terminal,
 };
@@ -16,6 +16,8 @@ fn main() -> io::Result<()> {
     let tab_state = Rc::new(RefCell::new(Tab::Info));
     let backend = DomBackend::new()?;
     let terminal = Terminal::new(backend)?;
+
+    let mut main_frame = MainFrame::new();
 
     let mut info_tab = InfoTab::new();
     let mut miner_tab = MinerTab::new();
@@ -38,14 +40,7 @@ fn main() -> io::Result<()> {
     terminal.draw_web(move |f| {
         let tab_state = tab_state.borrow();
 
-        f.render_widget(
-            Paragraph::new("").block(
-                Block::bordered().border_type(ratzilla::ratatui::widgets::BorderType::Rounded),
-            ),
-            f.area(),
-        );
-
-        f.render_widget(Paragraph::new(BANNER).centered(), f.area());
+        main_frame.render(f);
 
         match *tab_state {
             Tab::Info => info_tab.render(f),
@@ -54,6 +49,41 @@ fn main() -> io::Result<()> {
     });
 
     Ok(())
+}
+
+struct MainFrame {}
+
+impl MainFrame {
+    pub fn new() -> Self {
+        Self {}
+    }
+
+    pub fn render(&mut self, f: &mut Frame) {
+        self.title(f);
+        self.nav_controls(f);
+    }
+
+    fn title(&mut self, f: &mut Frame) {
+        let border = Paragraph::new("")
+            .block(Block::bordered().border_type(ratzilla::ratatui::widgets::BorderType::Rounded));
+        f.render_widget(border, f.area());
+
+        let title = Paragraph::new(BANNER).centered();
+        f.render_widget(title, f.area());
+    }
+    fn nav_controls(&mut self, f: &mut Frame) {
+        let controls = "| <- Previous Tab | -> Next Tab |";
+        let nav = Paragraph::new(controls).centered();
+
+        let area = Rect::new(
+            (f.area().width / 2) - (controls.len() as u16 / 2),
+            f.area().height - 1,
+            controls.len() as u16,
+            1,
+        );
+
+        f.render_widget(nav, area);
+    }
 }
 
 enum Tab {
