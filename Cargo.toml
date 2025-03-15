@@ -1,0 +1,7 @@
+[package]
+name = "sigmatui"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+ratzilla = "0.0.1"
