@@ -2,17 +2,21 @@ use assets::*;
 use sigmatui::{Tab, TAB_LENGTH};
 
 mod assets;
-mod info_tab;
+mod home_tab;
 mod main_frame;
 mod miner_tab;
 
 use std::{cell::RefCell, io, rc::Rc};
 
-use crate::info_tab::HomeTab;
+use crate::home_tab::HomeTab;
 use crate::main_frame::MainFrame;
 use crate::miner_tab::MinerTab;
 
-use ratzilla::{event::KeyCode, ratatui::Terminal, DomBackend, WebRenderer};
+use ratzilla::{
+    event::KeyCode,
+    ratatui::{layout::Rect, Terminal},
+    DomBackend, WebRenderer,
+};
 
 fn main() -> io::Result<()> {
     let tab_num_selected: Rc<RefCell<u8>> = Rc::new(RefCell::new(0));
@@ -45,12 +49,17 @@ fn main() -> io::Result<()> {
 
     terminal.draw_web(move |f| {
         let tab_num_selected = tab_num_selected.borrow();
+
         main_frame.render(f, &tab_num_selected);
 
         let tab_selected = Tab::new(&tab_num_selected);
 
         match tab_selected {
-            Tab::Home => home_tab.render(f),
+            Tab::Home => {
+                //prepare the area for indented widgets
+                let area = Rect::new(1, 6, f.area().width - 2, f.area().height - 7);
+                home_tab.render(f, area);
+            }
             Tab::Miner => miner_tab.render(f),
             Tab::Info => {}
         }
