@@ -3,9 +3,9 @@ use ratzilla::ratatui::{
     widgets::{Block, List, ListItem, Paragraph},
     Frame,
 };
-pub struct MinerTab {}
+pub struct Miner {}
 
-impl MinerTab {
+impl Miner {
     pub fn new() -> Self {
         Self {}
     }

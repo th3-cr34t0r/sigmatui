@@ -7,11 +7,11 @@ use ratzilla::ratatui::{
 };
 use sigmatui::TAB_TITLES;
 
-use crate::BANNER;
+use crate::assets::BANNER;
 
-pub struct MainFrame {}
+pub struct AppFrame {}
 
-impl MainFrame {
+impl AppFrame {
     pub fn new() -> Self {
         Self {}
     }

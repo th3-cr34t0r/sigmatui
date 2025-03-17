@@ -9,15 +9,16 @@ use ratzilla::ratatui::{
     Frame,
 };
 
-pub struct HomeTab {}
+pub struct Home {}
 
-impl HomeTab {
+impl Home {
     pub fn new() -> Self {
         Self {}
     }
 
     ///Render the tab frame
-    pub fn render(&mut self, f: &mut Frame, area: Rect) {
+    pub fn render(&mut self, f: &mut Frame) {
+        let area = Rect::new(1, 6, f.area().width - 2, f.area().height - 7);
         let vertical = Layout::vertical([Constraint::Percentage(50), Constraint::Percentage(50)]);
         let [top_area, bottom_area] = vertical.areas(area);
 
