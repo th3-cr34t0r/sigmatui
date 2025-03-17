@@ -1,5 +1,5 @@
-pub const TAB_LENGTH: u8 = 4;
-pub const TAB_TITLES: [&str; TAB_LENGTH as usize] = ["Home", "Miner", "Info", "INFO"];
+pub const TAB_LENGTH: u8 = 3;
+pub const TAB_TITLES: [&str; TAB_LENGTH as usize] = ["Home", "Miner", "Info"];
 pub enum Tab {
     Home,
     Miner,
