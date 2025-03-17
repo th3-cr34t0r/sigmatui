@@ -1,6 +1,7 @@
 use ratzilla::ratatui::{
     layout::Rect,
     style::{Modifier, Style, Stylize},
+    text::Line,
     widgets::{Block, BorderType, Borders, Paragraph, Tabs},
     Frame,
 };
@@ -28,19 +29,6 @@ impl MainFrame {
         let title = Paragraph::new(BANNER).centered();
         f.render_widget(title, f.area());
     }
-    fn nav_controls(&mut self, f: &mut Frame) {
-        let controls = "| <- Previous Tab | -> Next Tab |";
-        let nav = Paragraph::new(controls).centered();
-
-        let area = Rect::new(
-            (f.area().width / 2) - (controls.len() as u16 / 2),
-            f.area().height - 1,
-            controls.len() as u16,
-            1,
-        );
-
-        f.render_widget(nav, area);
-    }
 
     fn tab_bar(&mut self, f: &mut Frame, selected_tab: &u8) {
         let tab_bar = Tabs::new(TAB_TITLES.to_vec())
@@ -51,5 +39,19 @@ impl MainFrame {
         let tab_area = Rect::new(1, 0, (f.area().width as f32 * 0.3) as u16, 1);
 
         f.render_widget(tab_bar_selected, tab_area);
+    }
+
+    fn nav_controls(&mut self, f: &mut Frame) {
+        let controls = "| <- Previous Tab | -> Next Tab |";
+        let nav = Line::from(controls).centered();
+
+        let area = Rect::new(
+            (f.area().width / 2) - (controls.len() as u16 / 2),
+            f.area().height - 1,
+            controls.len() as u16,
+            1,
+        );
+
+        f.render_widget(nav, area);
     }
 }
