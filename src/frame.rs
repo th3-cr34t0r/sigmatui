@@ -35,7 +35,6 @@ impl AppFrame {
             .highlight_style(Style::new().add_modifier(Modifier::UNDERLINED));
 
         let tab_bar_selected = tab_bar.select(*selected_tab as usize);
-
         let tab_area = Rect::new(1, 0, (f.area().width as f32 * 0.3) as u16, 1);
 
         f.render_widget(tab_bar_selected, tab_area);

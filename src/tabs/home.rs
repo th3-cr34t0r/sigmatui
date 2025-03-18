@@ -1,10 +1,11 @@
 use ratzilla::ratatui::{
+    buffer::Buffer,
     layout::{Alignment, Constraint, Flex, Layout, Rect},
-    style::Stylize,
+    style::{Color, Stylize},
     symbols,
     widgets::{
-        canvas::Label, Axis, Block, BorderType, Borders, Chart, Dataset, GraphType, List, ListItem,
-        Paragraph, Row, Table,
+        canvas::Label, Axis, Bar, Block, BorderType, Borders, Chart, Dataset, Gauge, GraphType,
+        List, ListItem, Padding, Paragraph, Row, Table, Widget,
     },
     Frame,
 };
@@ -16,7 +17,7 @@ impl Home {
         Self {}
     }
 
-    ///Render the tab frame
+    ///Render home
     pub fn render(&mut self, f: &mut Frame) {
         let area = Rect::new(1, 6, f.area().width - 2, f.area().height - 7);
         let vertical = Layout::vertical([Constraint::Percentage(50), Constraint::Percentage(50)]);
@@ -27,15 +28,15 @@ impl Home {
 
         let [top_addresses_area, pool_hashrate_area] = horizontal.areas(top_area);
 
-        self.top_addresses(f, top_addresses_area);
+        self.top_addresses(top_addresses_area, f.buffer_mut());
 
-        self.pool_hashrate(f, pool_hashrate_area);
+        self.pool_hashrate_chart(pool_hashrate_area, f.buffer_mut());
 
-        self.pool_info(f, bottom_area);
+        self.pool_info(bottom_area, f.buffer_mut());
     }
 
     ///Provide logic for the top addresses
-    fn top_addresses(&mut self, f: &mut Frame, area: Rect) {
+    fn top_addresses(&mut self, area: Rect, buf: &mut Buffer) {
         let rows = [
             Row::new(vec!["address_1", "12.2 Gh/s"]),
             Row::new(vec!["address_2", "11.5 Gh/s"]),
@@ -47,19 +48,18 @@ impl Home {
 
         let widths = [Constraint::Percentage(70), Constraint::Percentage(30)];
 
-        let table = Table::new(rows, widths)
+        Table::new(rows, widths)
             .header(Row::new(vec!["Address", "Hashrate"]).on_red())
             .block(
                 Block::bordered()
                     .border_type(BorderType::Rounded)
                     .title_top("Top Miners"),
-            );
-
-        f.render_widget(table, area);
+            )
+            .render(area, buf);
     }
 
     ///Provide logic for pool hashrate section
-    fn pool_hashrate(&mut self, f: &mut Frame, area: Rect) {
+    fn pool_hashrate_chart(&mut self, area: Rect, buf: &mut Buffer) {
         let data = vec![
             (0.0, 16.1),
             (1.0, 16.6),
@@ -81,7 +81,7 @@ impl Home {
             .data(&data)
             .light_yellow();
 
-        let chart = Chart::new(vec![dataset])
+        Chart::new(vec![dataset])
             .block(
                 Block::bordered()
                     .border_type(BorderType::Rounded)
@@ -98,18 +98,51 @@ impl Home {
                     .bounds([13.0, 19.0])
                     .labels(["13.0".bold(), "15.0".into(), "19.0".bold()])
                     .title("Gh/s"),
-            );
-
-        f.render_widget(chart, area);
+            )
+            .render(area, buf);
     }
 
     ///Provide logic for pool info section
-    fn pool_info(&mut self, f: &mut Frame, area: Rect) {
-        let widget = Paragraph::new("").block(
-            Block::bordered()
-                .border_set(symbols::border::ROUNDED)
-                .title_top("Pool Info"),
-        );
-        f.render_widget(widget, area);
+    fn pool_info(&mut self, area: Rect, buf: &mut Buffer) {
+        Paragraph::new("")
+            .block(
+                Block::bordered()
+                    .border_set(symbols::border::ROUNDED)
+                    .title_top("Pool Info"),
+            )
+            .render(area, buf);
+
+        let horizontal = Layout::horizontal([
+            Constraint::Percentage(33),
+            Constraint::Percentage(33),
+            Constraint::Percentage(33),
+        ]);
+
+        let vertical = Layout::vertical([Constraint::Percentage(50), Constraint::Percentage(50)]);
+
+        let areas: [Rect; 3] = horizontal.areas(area);
+        let [middle_up, middle_down] = vertical.areas(areas[1]);
+
+        Gauge::default()
+            .block(
+                Block::new()
+                    .borders(Borders::LEFT | Borders::RIGHT)
+                    .padding(Padding::vertical(1))
+                    .title("Current Block Effort"),
+            )
+            .ratio(15.0 / 200.0)
+            .label(format!("{:.1}% / {:.1}%", 33, 200))
+            .render(middle_up, buf);
+
+        Gauge::default()
+            .block(
+                Block::new()
+                    .borders(Borders::LEFT | Borders::RIGHT)
+                    .padding(Padding::vertical(1))
+                    .title("Last Block Effort"),
+            )
+            .ratio(110.0 / 200.0)
+            .label(format!("{:.1}% / {:.1}%", 33, 200))
+            .render(middle_down, buf);
     }
 }
