@@ -2,7 +2,7 @@ use ratzilla::ratatui::{
     buffer::Buffer,
     layout::{Alignment, Constraint, Flex, Layout, Rect},
     style::{Color, Style, Stylize},
-    symbols,
+    symbols::{self, Marker},
     text::{Line, Span},
     widgets::{
         canvas::Label, Axis, Bar, Block, BorderType, Borders, Chart, Dataset, Gauge, GraphType,
@@ -23,8 +23,7 @@ impl Home {
         let area = Rect::new(1, 6, f.area().width - 2, f.area().height - 7);
 
         let vertical = Layout::vertical([Constraint::Percentage(50), Constraint::Percentage(50)]);
-        let horizontal =
-            Layout::horizontal([Constraint::Percentage(30), Constraint::Percentage(70)]);
+        let horizontal = Layout::horizontal([Constraint::Percentage(33), Constraint::Fill(1)]);
 
         let [top_area, bottom_area] = vertical.areas(area);
         let [top_addresses_area, pool_hashrate_area] = horizontal.areas(top_area);
@@ -33,7 +32,11 @@ impl Home {
         self.pool_hashrate_chart(pool_hashrate_area, f.buffer_mut());
 
         // Bottom half
-        let horizontal = Layout::horizontal([Constraint::Ratio(1, 3); 3]);
+        let horizontal = Layout::horizontal([
+            Constraint::Percentage(33),
+            Constraint::Fill(1),
+            Constraint::Percentage(33),
+        ]);
         let vertical = Layout::vertical([Constraint::Percentage(50), Constraint::Percentage(50)]);
 
         let [pool_info_area, block_effort_area, how_to_connect_area] =
@@ -89,6 +92,7 @@ impl Home {
 
         let dataset = Dataset::default()
             .graph_type(GraphType::Line)
+            .marker(Marker::Dot)
             .data(&data)
             .light_yellow();
 
