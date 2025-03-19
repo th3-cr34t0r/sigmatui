@@ -22,27 +22,28 @@ impl Home {
     pub fn render(&mut self, f: &mut Frame) {
         let area = Rect::new(1, 6, f.area().width - 2, f.area().height - 7);
 
-        let vertical = Layout::vertical([Constraint::Percentage(50), Constraint::Percentage(50)]);
-        let horizontal = Layout::horizontal([Constraint::Percentage(33), Constraint::Fill(1)]);
+        let [top_area, bottom_area] =
+            Layout::vertical([Constraint::Percentage(50), Constraint::Percentage(50)]).areas(area);
 
-        let [top_area, bottom_area] = vertical.areas(area);
-        let [top_addresses_area, pool_hashrate_area] = horizontal.areas(top_area);
+        let [top_addresses_area, pool_hashrate_area] =
+            Layout::horizontal([Constraint::Percentage(33), Constraint::Fill(1)]).areas(top_area);
 
+        let [pool_info_area, block_effort_area, how_to_connect_area] = Layout::horizontal([
+            Constraint::Percentage(33),
+            Constraint::Fill(1),
+            Constraint::Percentage(33),
+        ])
+        .areas(bottom_area);
+
+        let [block_effort_up, block_effort_down] =
+            Layout::vertical([Constraint::Percentage(50), Constraint::Percentage(50)])
+                .areas(block_effort_area);
+
+        // Top half
         self.top_addresses(top_addresses_area, f.buffer_mut());
         self.pool_hashrate_chart(pool_hashrate_area, f.buffer_mut());
 
         // Bottom half
-        let horizontal = Layout::horizontal([
-            Constraint::Percentage(33),
-            Constraint::Fill(1),
-            Constraint::Percentage(33),
-        ]);
-        let vertical = Layout::vertical([Constraint::Percentage(50), Constraint::Percentage(50)]);
-
-        let [pool_info_area, block_effort_area, how_to_connect_area] =
-            horizontal.areas(bottom_area);
-        let [block_effort_up, block_effort_down] = vertical.areas(block_effort_area);
-
         self.pool_info(&pool_info_area, f.buffer_mut());
         self.current_effort_gauge(&35.0, &block_effort_up, f.buffer_mut());
         self.last_effort_gauge(&61.5, &block_effort_down, f.buffer_mut());
@@ -147,6 +148,7 @@ impl Home {
             format!("{:.1}/100", *progress),
             Style::new().italic().bold(),
         );
+
         Gauge::default()
             .block(title)
             .gauge_style(Style::new().fg(Color::LightRed).bg(Color::Red))
@@ -159,6 +161,7 @@ impl Home {
         let title = self.title_block("Last Block Effort", Color::White);
 
         let label = Span::styled(format!("{:.1}/100", 66.4), Style::new().italic().bold());
+
         Gauge::default()
             .block(title)
             .gauge_style(Style::new().fg(Color::LightCyan).bg(Color::Cyan))

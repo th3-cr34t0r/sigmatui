@@ -1,8 +1,10 @@
 use ratzilla::ratatui::{
-    layout::Rect,
-    style::{Modifier, Style, Stylize},
+    buffer::Buffer,
+    layout::{Constraint, Layout, Rect},
+    style::{Color, Modifier, Style, Stylize},
+    symbols,
     text::Line,
-    widgets::{Block, BorderType, Borders, Paragraph, Tabs},
+    widgets::{Block, BorderType, Borders, Padding, Paragraph, Tabs, Widget},
     Frame,
 };
 use sigmatui::TAB_TITLES;
@@ -17,40 +19,39 @@ impl AppFrame {
     }
 
     pub fn render(&mut self, f: &mut Frame, selected_tab: &u8) {
-        self.title(f);
-        self.tab_bar(f, selected_tab);
-        self.nav_controls(f);
+        self.title(&f.area(), f.buffer_mut());
+        self.tab_bar(&f.area(), f.buffer_mut(), selected_tab);
+        self.nav_controls(&f.area(), f.buffer_mut());
     }
 
-    fn title(&mut self, f: &mut Frame) {
-        let border = Paragraph::new("").block(Block::bordered().border_type(BorderType::Rounded));
-        f.render_widget(border, f.area());
+    fn title(&mut self, area: &Rect, buf: &mut Buffer) {
+        Block::bordered()
+            .border_type(BorderType::Rounded)
+            .render(*area, buf);
 
-        let title = Paragraph::new(BANNER).centered();
-        f.render_widget(title, f.area());
+        Paragraph::new(BANNER).centered().render(*area, buf);
     }
 
-    fn tab_bar(&mut self, f: &mut Frame, selected_tab: &u8) {
-        let tab_bar = Tabs::new(TAB_TITLES.to_vec())
-            .highlight_style(Style::new().add_modifier(Modifier::UNDERLINED));
+    fn tab_bar(&mut self, area: &Rect, buf: &mut Buffer, selected_tab: &u8) {
+        let tab_area = Rect::new(1, 0, (area.width as f32 * 0.3) as u16, 1);
 
-        let tab_bar_selected = tab_bar.select(*selected_tab as usize);
-        let tab_area = Rect::new(1, 0, (f.area().width as f32 * 0.3) as u16, 1);
-
-        f.render_widget(tab_bar_selected, tab_area);
+        Tabs::new(TAB_TITLES.to_vec())
+            .highlight_style(Style::new().add_modifier(Modifier::UNDERLINED))
+            .divider("|")
+            .select(*selected_tab as usize)
+            .render(tab_area, buf);
     }
 
-    fn nav_controls(&mut self, f: &mut Frame) {
+    fn nav_controls(&mut self, area: &Rect, buf: &mut Buffer) {
         let controls = "| <- Previous Tab | -> Next Tab |";
-        let nav = Line::from(controls).centered();
 
-        let area = Rect::new(
-            (f.area().width / 2) - (controls.len() as u16 / 2),
-            f.area().height - 1,
+        let nav_area = Rect::new(
+            (area.width / 2) - (controls.len() as u16 / 2),
+            area.height - 1,
             controls.len() as u16,
             1,
         );
 
-        f.render_widget(nav, area);
+        Line::from(controls).centered().render(nav_area, buf);
     }
 }
