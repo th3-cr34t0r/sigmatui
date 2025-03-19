@@ -1,8 +1,9 @@
 use ratzilla::ratatui::{
     buffer::Buffer,
     layout::{Alignment, Constraint, Flex, Layout, Rect},
-    style::{Color, Stylize},
+    style::{Color, Style, Stylize},
     symbols,
+    text::{Line, Span},
     widgets::{
         canvas::Label, Axis, Bar, Block, BorderType, Borders, Chart, Dataset, Gauge, GraphType,
         List, ListItem, Padding, Paragraph, Row, Table, Widget,
@@ -20,19 +21,29 @@ impl Home {
     ///Render home
     pub fn render(&mut self, f: &mut Frame) {
         let area = Rect::new(1, 6, f.area().width - 2, f.area().height - 7);
-        let vertical = Layout::vertical([Constraint::Percentage(50), Constraint::Percentage(50)]);
-        let [top_area, bottom_area] = vertical.areas(area);
 
+        let vertical = Layout::vertical([Constraint::Percentage(50), Constraint::Percentage(50)]);
         let horizontal =
             Layout::horizontal([Constraint::Percentage(30), Constraint::Percentage(70)]);
 
+        let [top_area, bottom_area] = vertical.areas(area);
         let [top_addresses_area, pool_hashrate_area] = horizontal.areas(top_area);
 
         self.top_addresses(top_addresses_area, f.buffer_mut());
-
         self.pool_hashrate_chart(pool_hashrate_area, f.buffer_mut());
 
-        self.pool_info(bottom_area, f.buffer_mut());
+        // Bottom half
+        let horizontal = Layout::horizontal([Constraint::Ratio(1, 3); 3]);
+        let vertical = Layout::vertical([Constraint::Percentage(50), Constraint::Percentage(50)]);
+
+        let [pool_info_area, block_effort_area, how_to_connect_area] =
+            horizontal.areas(bottom_area);
+        let [block_effort_up, block_effort_down] = vertical.areas(block_effort_area);
+
+        self.pool_info(&pool_info_area, f.buffer_mut());
+        self.current_effort_gauge(&35.0, &block_effort_up, f.buffer_mut());
+        self.last_effort_gauge(&61.5, &block_effort_down, f.buffer_mut());
+        self.how_to_connect(&how_to_connect_area, f.buffer_mut());
     }
 
     ///Provide logic for the top addresses
@@ -102,47 +113,64 @@ impl Home {
             .render(area, buf);
     }
 
-    ///Provide logic for pool info section
-    fn pool_info(&mut self, area: Rect, buf: &mut Buffer) {
-        Paragraph::new("")
+    ///Pool related info
+    fn pool_info(&self, area: &Rect, buf: &mut Buffer) {
+        Paragraph::new("Fee: 1%")
             .block(
                 Block::bordered()
                     .border_set(symbols::border::ROUNDED)
                     .title_top("Pool Info"),
             )
-            .render(area, buf);
+            .centered()
+            .render(*area, buf);
+    }
 
-        let horizontal = Layout::horizontal([
-            Constraint::Percentage(33),
-            Constraint::Percentage(33),
-            Constraint::Percentage(33),
-        ]);
+    ///Block title
+    fn title_block(&self, title: &'static str, color: Color) -> Block {
+        let title = Line::from(title);
+        Block::bordered()
+            .title_top(title)
+            .border_type(BorderType::Rounded)
+            .padding(Padding::vertical(1))
+            .fg(color)
+    }
 
-        let vertical = Layout::vertical([Constraint::Percentage(50), Constraint::Percentage(50)]);
+    ///Current block effort gauge
+    fn current_effort_gauge(&self, progress: &f64, area: &Rect, buf: &mut Buffer) {
+        let title = self.title_block("Current Block Effort", Color::White);
 
-        let areas: [Rect; 3] = horizontal.areas(area);
-        let [middle_up, middle_down] = vertical.areas(areas[1]);
-
+        let label = Span::styled(
+            format!("{:.1}/100", *progress),
+            Style::new().italic().bold(),
+        );
         Gauge::default()
-            .block(
-                Block::new()
-                    .borders(Borders::LEFT | Borders::RIGHT)
-                    .padding(Padding::vertical(1))
-                    .title("Current Block Effort"),
-            )
-            .ratio(15.0 / 200.0)
-            .label(format!("{:.1}% / {:.1}%", 33, 200))
-            .render(middle_up, buf);
+            .block(title)
+            .gauge_style(Style::new().fg(Color::LightRed).bg(Color::Red))
+            .ratio(*progress / 100.0)
+            .label(label)
+            .render(*area, buf);
+    }
+    ///Last Block Effort gauge
+    fn last_effort_gauge(&self, progress: &f64, area: &Rect, buf: &mut Buffer) {
+        let title = self.title_block("Last Block Effort", Color::White);
 
+        let label = Span::styled(format!("{:.1}/100", 66.4), Style::new().italic().bold());
         Gauge::default()
+            .block(title)
+            .gauge_style(Style::new().fg(Color::LightCyan).bg(Color::Cyan))
+            .ratio(*progress / 100.0)
+            .label(label)
+            .render(*area, buf);
+    }
+    ///Block explaining how to connect
+    fn how_to_connect(&self, area: &Rect, buf: &mut Buffer) {
+        Paragraph::new("Under 10 Gh/s:\n 192.168.0.0")
             .block(
-                Block::new()
-                    .borders(Borders::LEFT | Borders::RIGHT)
-                    .padding(Padding::vertical(1))
-                    .title("Last Block Effort"),
+                Block::bordered()
+                    .border_set(symbols::border::ROUNDED)
+                    .title_top("How To Connect"),
             )
-            .ratio(110.0 / 200.0)
-            .label(format!("{:.1}% / {:.1}%", 33, 200))
-            .render(middle_down, buf);
+            .centered()
+            .render(*area, buf);
     }
 }
