@@ -12,33 +12,21 @@ use crate::app::App;
 use ratzilla::{event::KeyCode, ratatui::Terminal, DomBackend, WebRenderer};
 
 fn main() -> io::Result<()> {
-    let app: Rc<RefCell<App>> = Rc::new(RefCell::new(App::new()));
     let backend = DomBackend::new()?;
     let terminal = Terminal::new(backend)?;
 
+    let state: Rc<App> = Rc::new(App::default());
+
+    let event_state = Rc::clone(&state);
     terminal.on_key_event({
-        let app_cloned = app.clone();
-        move |key_event| match key_event.code {
-            KeyCode::Left => {
-                let mut app = app_cloned.borrow_mut();
-                if app.tab_selected != 0 {
-                    app.tab_selected -= 1;
-                }
-            }
-            KeyCode::Right => {
-                let mut app = app_cloned.borrow_mut();
-                if app.tab_selected != (TAB_LENGTH - 1) {
-                    app.tab_selected += 1;
-                }
-            }
-            _ => {}
+        move |key_event| {
+            event_state.handle_events(key_event);
         }
     });
 
-    terminal.draw_web(move |f| {
-        let mut app = app.borrow_mut();
-
-        app.run(f);
+    let render_state = Rc::clone(&state);
+    terminal.draw_web(move |frame| {
+        render_state.render(frame);
     });
 
     Ok(())

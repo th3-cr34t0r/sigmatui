@@ -11,15 +11,12 @@ use ratzilla::ratatui::{
     Frame,
 };
 
+#[derive(Default)]
 pub struct Home {}
 
 impl Home {
-    pub fn new() -> Self {
-        Self {}
-    }
-
     ///Render home
-    pub fn render(&mut self, f: &mut Frame) {
+    pub fn render(&self, f: &mut Frame) {
         let area = Rect::new(1, 6, f.area().width - 2, f.area().height - 7);
 
         let [top_area, bottom_area] =
@@ -51,7 +48,7 @@ impl Home {
     }
 
     ///Provide logic for the top addresses
-    fn top_addresses(&mut self, area: Rect, buf: &mut Buffer) {
+    fn top_addresses(&self, area: Rect, buf: &mut Buffer) {
         let rows = [
             Row::new(vec!["address_1", "12.2 Gh/s"]),
             Row::new(vec!["address_2", "11.5 Gh/s"]),
@@ -74,7 +71,7 @@ impl Home {
     }
 
     ///Provide logic for pool hashrate section
-    fn pool_hashrate_chart(&mut self, area: Rect, buf: &mut Buffer) {
+    fn pool_hashrate_chart(&self, area: Rect, buf: &mut Buffer) {
         let data = vec![
             (0.0, 16.1),
             (1.0, 16.6),

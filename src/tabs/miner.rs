@@ -3,16 +3,15 @@ use ratzilla::ratatui::{
     widgets::{Block, List, ListItem, Paragraph},
     Frame,
 };
+
+#[derive(Default)]
 pub struct Miner {}
 
 impl Miner {
-    pub fn new() -> Self {
-        Self {}
-    }
-    pub fn render(&mut self, f: &mut Frame) {
+    pub fn render(&self, f: &mut Frame) {
         self.miner_address(f);
     }
-    fn miner_address(&mut self, f: &mut Frame) {
+    fn miner_address(&self, f: &mut Frame) {
         let widget = Paragraph::new("Miner Address")
             .block(Block::bordered())
             .centered();
