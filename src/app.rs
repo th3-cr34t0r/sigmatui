@@ -1,3 +1,4 @@
+use std::borrow::BorrowMut;
 use std::cell::RefCell;
 
 use crate::frame::AppFrame;
@@ -9,36 +10,51 @@ use sigmatui::{Tab, TAB_LENGTH};
 
 #[derive(Default)]
 pub struct App {
-    pub tab_selected: RefCell<u8>,
+    selected_tab: RefCell<u8>,
     app_frame: AppFrame,
     home: Home,
-    miner: Miner,
+    miner: RefCell<Miner>,
     info: Info,
 }
 
 impl App {
     pub fn render(&self, frame: &mut Frame) {
-        let tab_selected = self.tab_selected.borrow();
+        let tab_selected = self.selected_tab.borrow();
         self.app_frame.render(frame, &tab_selected);
 
         match Tab::new(&tab_selected) {
             Tab::Home => self.home.render(frame),
-            Tab::Miner => self.miner.render(frame),
+            Tab::Miner => self.miner.borrow().render(frame),
             Tab::Info => self.info.render(),
         }
     }
     pub fn handle_events(&self, key_event: KeyEvent) {
         match key_event.code {
             KeyCode::Left => {
-                let mut tab_selected = self.tab_selected.borrow_mut();
-                if *tab_selected != 0 {
-                    *tab_selected -= 1;
+                let mut miner = self.miner.borrow_mut();
+                miner.popup = false;
+
+                let mut selected_tab = self.selected_tab.borrow_mut();
+                if *selected_tab != 0 {
+                    *selected_tab -= 1;
                 }
             }
             KeyCode::Right => {
-                let mut tab_selected = self.tab_selected.borrow_mut();
-                if *tab_selected != (TAB_LENGTH - 1) {
-                    *tab_selected += 1;
+                let mut miner = self.miner.borrow_mut();
+                miner.popup = false;
+
+                let mut selected_tab = self.selected_tab.borrow_mut();
+                if *selected_tab != (TAB_LENGTH - 1) {
+                    *selected_tab += 1;
+                }
+            }
+            KeyCode::Char(char) => {
+                if char == 's' {
+                    let selected_tab = self.selected_tab.borrow();
+                    if *selected_tab == 1 {
+                        let mut miner = self.miner.borrow_mut();
+                        miner.popup = true;
+                    }
                 }
             }
             _ => {}

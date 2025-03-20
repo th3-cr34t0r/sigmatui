@@ -5,12 +5,17 @@ use ratzilla::ratatui::{
 };
 
 #[derive(Default)]
-pub struct Miner {}
+pub struct Miner {
+    pub popup: bool,
+}
 
 impl Miner {
     pub fn render(&self, f: &mut Frame) {
-        self.miner_address(f);
+        if self.popup {
+            self.miner_address(f);
+        }
     }
+
     fn miner_address(&self, f: &mut Frame) {
         let widget = Paragraph::new("Miner Address")
             .block(Block::bordered())

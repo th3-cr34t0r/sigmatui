@@ -6,7 +6,7 @@ use ratzilla::ratatui::{
     widgets::{Block, BorderType, Paragraph, Tabs, Widget},
     Frame,
 };
-use sigmatui::TAB_TITLES;
+use sigmatui::{Tab, TAB_TITLES};
 
 use crate::assets::BANNER;
 
@@ -17,7 +17,7 @@ impl AppFrame {
     pub fn render(&self, frame: &mut Frame, selected_tab: &u8) {
         self.title(&frame.area(), frame.buffer_mut());
         self.tab_bar(&frame.area(), frame.buffer_mut(), selected_tab);
-        self.nav_controls(&frame.area(), frame.buffer_mut());
+        self.nav_controls(&frame.area(), frame.buffer_mut(), selected_tab);
     }
 
     fn title(&self, area: &Rect, buf: &mut Buffer) {
@@ -42,7 +42,41 @@ impl AppFrame {
             .render(tab_area, buf);
     }
 
-    fn nav_controls(&self, area: &Rect, buf: &mut Buffer) {
+    fn nav_controls(&self, area: &Rect, buf: &mut Buffer, selected_tab: &u8) {
+        match Tab::new(selected_tab) {
+            Tab::Home => self.home_nav_controls(area, buf),
+
+            Tab::Miner => self.miner_nav_controls(area, buf),
+
+            Tab::Info => self.info_nav_controls(area, buf),
+        }
+    }
+
+    fn home_nav_controls(&self, area: &Rect, buf: &mut Buffer) {
+        let controls = "| <- Previous Tab | -> Next Tab |";
+
+        let nav_area = Rect::new(
+            (area.width / 2) - (controls.len() as u16 / 2),
+            area.height - 1,
+            controls.len() as u16,
+            1,
+        );
+
+        Line::from(controls).centered().render(nav_area, buf);
+    }
+    fn miner_nav_controls(&self, area: &Rect, buf: &mut Buffer) {
+        let controls = "| <- Previous Tab | -> Next Tab | S Search Address | P Paste |";
+
+        let nav_area = Rect::new(
+            (area.width / 2) - (controls.len() as u16 / 2),
+            area.height - 1,
+            controls.len() as u16,
+            1,
+        );
+
+        Line::from(controls).centered().render(nav_area, buf);
+    }
+    fn info_nav_controls(&self, area: &Rect, buf: &mut Buffer) {
         let controls = "| <- Previous Tab | -> Next Tab |";
 
         let nav_area = Rect::new(
