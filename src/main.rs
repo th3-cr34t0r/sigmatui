@@ -1,6 +1,5 @@
-use sigmatui::TAB_LENGTH;
 
-use std::{cell::RefCell, io, rc::Rc};
+use std::{io, rc::Rc};
 
 mod app;
 mod assets;
@@ -9,7 +8,7 @@ mod tabs;
 
 use crate::app::App;
 
-use ratzilla::{event::KeyCode, ratatui::Terminal, DomBackend, WebRenderer};
+use ratzilla::{ratatui::Terminal, DomBackend, WebRenderer};
 
 fn main() -> io::Result<()> {
     let backend = DomBackend::new()?;

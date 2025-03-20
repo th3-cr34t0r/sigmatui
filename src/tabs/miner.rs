@@ -1,6 +1,6 @@
 use ratzilla::ratatui::{
     layout::Rect,
-    widgets::{Block, List, ListItem, Paragraph},
+    widgets::{Block, Paragraph},
     Frame,
 };
 

@@ -1,13 +1,10 @@
 use std::cell::RefCell;
 
 use crate::frame::AppFrame;
-use crate::tabs::{home::Home, info::Info, miner::Miner};
+use crate::tabs::info::Info;
+use crate::tabs::{home::Home, miner::Miner};
 use ratzilla::event::KeyEvent;
-use ratzilla::{
-    event::KeyCode,
-    ratatui::{layout::Rect, Frame, Terminal},
-    DomBackend, WebRenderer,
-};
+use ratzilla::{event::KeyCode, ratatui::Frame};
 use sigmatui::{Tab, TAB_LENGTH};
 
 #[derive(Default)]
@@ -16,21 +13,20 @@ pub struct App {
     app_frame: AppFrame,
     home: Home,
     miner: Miner,
-    info: u8,
+    info: Info,
 }
 
 impl App {
     pub fn render(&self, frame: &mut Frame) {
         let tab_selected = self.tab_selected.borrow();
-        self.app_frame.render(frame, &*tab_selected);
+        self.app_frame.render(frame, &tab_selected);
 
-        match Tab::new(&self.tab_selected.borrow_mut()) {
+        match Tab::new(&tab_selected) {
             Tab::Home => self.home.render(frame),
             Tab::Miner => self.miner.render(frame),
-            Tab::Info => {}
+            Tab::Info => self.info.render(),
         }
     }
-
     pub fn handle_events(&self, key_event: KeyEvent) {
         match key_event.code {
             KeyCode::Left => {

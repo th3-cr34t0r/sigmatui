@@ -1,12 +1,9 @@
-use std::cell::RefCell;
-
 use ratzilla::ratatui::{
     buffer::Buffer,
-    layout::{Constraint, Layout, Rect},
-    style::{Color, Modifier, Style, Stylize},
-    symbols,
+    layout::Rect,
+    style::{Color, Style},
     text::Line,
-    widgets::{Block, BorderType, Borders, Padding, Paragraph, Tabs, Widget},
+    widgets::{Block, BorderType, Paragraph, Tabs, Widget},
     Frame,
 };
 use sigmatui::TAB_TITLES;
@@ -31,7 +28,7 @@ impl AppFrame {
         Paragraph::new(BANNER).centered().render(*area, buf);
     }
 
-    fn tab_bar(&self, area: &Rect, buf: &mut Buffer, selected_tab: &u8) {
+    fn tab_bar(&self, _area: &Rect, buf: &mut Buffer, selected_tab: &u8) {
         let tab_length = TAB_TITLES.join(" ").len() + 6;
 
         let tab_area = Rect::new(1, 0, tab_length as u16, 1);

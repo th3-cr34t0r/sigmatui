@@ -1,12 +1,11 @@
 use ratzilla::ratatui::{
     buffer::Buffer,
-    layout::{Alignment, Constraint, Flex, Layout, Rect},
+    layout::{Constraint, Layout, Rect},
     style::{Color, Style, Stylize},
     symbols::{self, Marker},
     text::{Line, Span},
     widgets::{
-        canvas::Label, Axis, Bar, Block, BorderType, Borders, Chart, Dataset, Gauge, GraphType,
-        List, ListItem, Padding, Paragraph, Row, Table, Widget,
+        Axis, Block, BorderType, Chart, Dataset, Gauge, GraphType, Padding, Paragraph, Row, Table, Widget,
     },
     Frame,
 };
