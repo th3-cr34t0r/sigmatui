@@ -53,7 +53,7 @@ impl App {
                     let selected_tab = self.selected_tab.borrow();
                     if *selected_tab == 1 {
                         let mut miner = self.miner.borrow_mut();
-                        miner.popup = true;
+                        miner.popup = !miner.popup;
                     }
                 }
             }
