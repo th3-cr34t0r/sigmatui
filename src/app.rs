@@ -4,6 +4,7 @@ use std::cell::RefCell;
 use crate::frame::AppFrame;
 use crate::tabs::info::Info;
 use crate::tabs::{home::Home, miner::Miner};
+use clipboard::{ClipboardContext, ClipboardProvider};
 use ratzilla::event::KeyEvent;
 use ratzilla::{event::KeyCode, ratatui::Frame};
 use sigmatui::{Tab, TAB_LENGTH};
@@ -51,9 +52,21 @@ impl App {
             KeyCode::Char(char) => {
                 if char == 's' {
                     let selected_tab = self.selected_tab.borrow();
-                    if *selected_tab == 1 {
+                    if let Tab::Miner = Tab::new(&selected_tab) {
                         let mut miner = self.miner.borrow_mut();
                         miner.popup = !miner.popup;
+                    }
+                } else if char == 'p' {
+                    let selected_tab = self.selected_tab.borrow();
+                    if let Tab::Miner = Tab::new(&selected_tab) {
+                        let mut miner = self.miner.borrow_mut();
+                        if miner.popup {
+                            let mut clipboard_content: ClipboardContext =
+                                ClipboardProvider::new().unwrap();
+
+                            miner.address = clipboard_content.get_contents().unwrap();
+                            println!("{:?}", miner.address);
+                        }
                     }
                 }
             }

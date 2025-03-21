@@ -53,7 +53,7 @@ impl AppFrame {
     }
 
     fn home_nav_controls(&self, area: &Rect, buf: &mut Buffer) {
-        let controls = "| <- Previous Tab | -> Next Tab |";
+        let controls = "| [<-] Previous Tab | [->] Next Tab |";
 
         let nav_area = Rect::new(
             (area.width / 2) - (controls.len() as u16 / 2),
@@ -65,7 +65,7 @@ impl AppFrame {
         Line::from(controls).centered().render(nav_area, buf);
     }
     fn miner_nav_controls(&self, area: &Rect, buf: &mut Buffer) {
-        let controls = "| <- Previous Tab | -> Next Tab | S Search Address | P Paste |";
+        let controls = "| [<-] Previous Tab | [->] Next Tab | [S] Search Address |";
 
         let nav_area = Rect::new(
             (area.width / 2) - (controls.len() as u16 / 2),
@@ -77,7 +77,7 @@ impl AppFrame {
         Line::from(controls).centered().render(nav_area, buf);
     }
     fn info_nav_controls(&self, area: &Rect, buf: &mut Buffer) {
-        let controls = "| <- Previous Tab | -> Next Tab |";
+        let controls = "| [<-] Previous Tab | [->] Next Tab |";
 
         let nav_area = Rect::new(
             (area.width / 2) - (controls.len() as u16 / 2),
