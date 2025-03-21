@@ -1,16 +1,18 @@
+use std::{borrow::BorrowMut, cell::RefCell};
+
 use ratzilla::ratatui::{
     buffer::Buffer,
     layout::{Alignment, Constraint, Layout, Rect},
     style::{Color, Style, Stylize},
     text::Line,
-    widgets::{Block, BorderType, Clear, Paragraph, Widget},
+    widgets::{Block, BorderType, Chart, Clear, Paragraph, Widget},
     Frame,
 };
 
 #[derive(Default)]
 pub struct Miner {
     pub popup: bool,
-    pub address: String,
+    pub address: RefCell<String>,
 }
 
 impl Miner {
@@ -22,9 +24,21 @@ impl Miner {
         self.popup_address_input(&area, frame.buffer_mut());
     }
 
+    pub fn char_to_insert(&self, char: char) {
+        let mut address = self.address.borrow_mut();
+
+        let index = address.len();
+
+        address.insert(index, char);
+    }
+
     fn miner(&self, area: &Rect, buf: &mut Buffer) {
-        Paragraph::new(self.address.as_str())
-            .block(Block::bordered().border_type(BorderType::Rounded))
+        Paragraph::new("")
+            .block(
+                Block::bordered()
+                    .border_type(BorderType::Rounded)
+                    .title_top(self.address.borrow().as_str()),
+            )
             .render(*area, buf);
     }
 
@@ -45,7 +59,7 @@ impl Miner {
             .areas(popup_area[1]);
 
             Clear.render(popup_area, buf);
-            Paragraph::new(self.address.as_str())
+            Paragraph::new(self.address.borrow().as_str())
                 .block(
                     Block::bordered()
                         .title_top("Input Miner Address")
