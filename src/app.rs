@@ -4,9 +4,14 @@ use std::cell::RefCell;
 use crate::frame::AppFrame;
 use crate::tabs::info::Info;
 use crate::tabs::{home::Home, miner::Miner};
+use async_std::task;
 use ratzilla::event::KeyEvent;
 use ratzilla::{event::KeyCode, ratatui::Frame};
 use sigmatui::{Tab, TAB_LENGTH};
+use wasm_bindgen::prelude::*;
+use wasm_bindgen::JsValue;
+use wasm_bindgen_futures::JsFuture;
+use web_sys::window;
 
 #[derive(Default)]
 enum InputMode {
@@ -82,8 +87,18 @@ impl App {
                         let selected_tab = self.selected_tab.borrow();
                         if let Tab::Miner = Tab::new(&selected_tab) {
                             let miner = self.miner.borrow_mut();
-                            if miner.popup {
-                                miner.char_to_insert(char);
+                            if miner.popup && char == 'p' {
+                                // miner.char_to_insert(char);
+                                let clipboard_content =
+                                    task::block_on(async { get_clipboard_content().await });
+                                // miner
+                                //     .address
+                                //     .borrow_mut()
+                                //     .push_str(clipboard_content.ok().unwrap().as_str());
+
+                                // if let Ok(content) = clipboard_content {
+                                //     miner.address.borrow_mut().push_str(content.as_str());
+                                // }
                             }
                         }
                     }
@@ -99,4 +114,17 @@ impl App {
             _ => {}
         }
     }
+}
+
+#[wasm_bindgen]
+pub async fn get_clipboard_content() -> Result<String, JsValue> {
+    let window = window().expect("No global window exists");
+
+    let clipboard = window.navigator().clipboard();
+
+    let text = clipboard.read_text();
+
+    let content = JsFuture::from(text).await.expect("").as_string().unwrap();
+
+    Ok(content)
 }
