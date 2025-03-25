@@ -5,7 +5,8 @@ use ratzilla::ratatui::{
     symbols::{self, Marker},
     text::{Line, Span},
     widgets::{
-        Axis, Block, BorderType, Chart, Dataset, Gauge, GraphType, Padding, Paragraph, Row, Table, Widget,
+        Axis, Block, BorderType, Chart, Dataset, Gauge, GraphType, Padding, Paragraph, Row, Table,
+        Widget,
     },
     Frame,
 };
@@ -36,8 +37,8 @@ impl Home {
                 .areas(block_effort_area);
 
         // Top half
-        self.top_addresses(top_addresses_area, f.buffer_mut());
-        self.pool_hashrate_chart(pool_hashrate_area, f.buffer_mut());
+        self.top_addresses(&top_addresses_area, f.buffer_mut());
+        self.pool_hashrate_chart(&pool_hashrate_area, f.buffer_mut());
 
         // Bottom half
         self.pool_info(&pool_info_area, f.buffer_mut());
@@ -47,7 +48,7 @@ impl Home {
     }
 
     ///Provide logic for the top addresses
-    fn top_addresses(&self, area: Rect, buf: &mut Buffer) {
+    fn top_addresses(&self, area: &Rect, buf: &mut Buffer) {
         let rows = [
             Row::new(vec!["address_1", "12.2 Gh/s"]),
             Row::new(vec!["address_2", "11.5 Gh/s"]),
@@ -66,11 +67,11 @@ impl Home {
                     .border_type(BorderType::Rounded)
                     .title_top("Top Miners"),
             )
-            .render(area, buf);
+            .render(*area, buf);
     }
 
     ///Provide logic for pool hashrate section
-    fn pool_hashrate_chart(&self, area: Rect, buf: &mut Buffer) {
+    fn pool_hashrate_chart(&self, area: &Rect, buf: &mut Buffer) {
         let data = vec![
             (0.0, 16.1),
             (1.0, 16.6),
@@ -111,7 +112,7 @@ impl Home {
                     .labels(["13.0".bold(), "15.0".into(), "19.0".bold()])
                     .title("Gh/s"),
             )
-            .render(area, buf);
+            .render(*area, buf);
     }
 
     ///Pool related info

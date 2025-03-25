@@ -88,13 +88,14 @@ impl App {
                         if let Tab::Miner = Tab::new(&selected_tab) {
                             let miner = self.miner.borrow_mut();
                             if miner.popup && char == 'p' {
+                                miner.address.borrow_mut().push_str("TEXT");
                                 // miner.char_to_insert(char);
-                                let clipboard_content =
-                                    task::block_on(async { get_clipboard_content().await });
-                                // miner
-                                //     .address
-                                //     .borrow_mut()
-                                //     .push_str(clipboard_content.ok().unwrap().as_str());
+                                // let clipboard_content =
+                                //     task::block_on(async { get_clipboard_content().await });
+                                // // miner
+                                // //     .address
+                                // //     .borrow_mut()
+                                // //     .push_str(clipboard_content.ok().unwrap().as_str());
 
                                 // if let Ok(content) = clipboard_content {
                                 //     miner.address.borrow_mut().push_str(content.as_str());
