@@ -1,10 +1,9 @@
-use std::borrow::BorrowMut;
 use std::cell::RefCell;
+use std::sync::{Arc, Mutex};
 
 use crate::frame::AppFrame;
 use crate::tabs::info::Info;
 use crate::tabs::{home::Home, miner::Miner};
-use async_std::task;
 use ratzilla::event::KeyEvent;
 use ratzilla::{event::KeyCode, ratatui::Frame};
 use sigmatui::{Tab, TAB_LENGTH};
@@ -88,18 +87,21 @@ impl App {
                         if let Tab::Miner = Tab::new(&selected_tab) {
                             let miner = self.miner.borrow_mut();
                             if miner.popup && char == 'p' {
-                                miner.address.borrow_mut().push_str("TEXT");
-                                // miner.char_to_insert(char);
-                                // let clipboard_content =
-                                //     task::block_on(async { get_clipboard_content().await });
-                                // // miner
-                                // //     .address
-                                // //     .borrow_mut()
-                                // //     .push_str(clipboard_content.ok().unwrap().as_str());
+                                let clipboard_content = Arc::new(Mutex::new(String::new()));
 
-                                // if let Ok(content) = clipboard_content {
-                                //     miner.address.borrow_mut().push_str(content.as_str());
-                                // }
+                                let clipboard_content_cloned = clipboard_content.clone();
+                                wasm_bindgen_futures::spawn_local(async move {
+                                    let mut clipboard_content =
+                                        clipboard_content_cloned.lock().unwrap();
+
+                                    clipboard_content
+                                        .push_str(get_clipboard_content().await.unwrap().as_str());
+                                });
+
+                                miner
+                                    .address
+                                    .borrow_mut()
+                                    .push_str(clipboard_content.lock().unwrap().as_str());
                             }
                         }
                     }

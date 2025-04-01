@@ -1,12 +1,12 @@
 use ratzilla::ratatui::{
     buffer::Buffer,
-    layout::{Constraint, Layout, Rect},
-    style::{Color, Style, Stylize},
+    layout::{Alignment, Constraint, Layout, Rect},
+    style::{Color, Modifier, Style, Stylize},
     symbols::{self, Marker},
     text::{Line, Span},
     widgets::{
-        Axis, Block, BorderType, Chart, Dataset, Gauge, GraphType, Padding, Paragraph, Row, Table,
-        Widget,
+        Axis, Block, BorderType, Borders, Chart, Dataset, Gauge, GraphType, Padding, Paragraph,
+        Row, Table, Widget, Wrap,
     },
     Frame,
 };
@@ -117,7 +117,7 @@ impl Home {
 
     ///Pool related info
     fn pool_info(&self, area: &Rect, buf: &mut Buffer) {
-        Paragraph::new("Fee: 1%")
+        Paragraph::new("")
             .block(
                 Block::bordered()
                     .border_set(symbols::border::ROUNDED)
@@ -125,6 +125,106 @@ impl Home {
             )
             .centered()
             .render(*area, buf);
+
+        let [_left, horizontally_centered_area, _right] = Layout::horizontal([
+            Constraint::Fill(1),
+            Constraint::Percentage(90),
+            Constraint::Fill(1),
+        ])
+        .areas(*area);
+
+        let [_top_margin, centered_area, _bottom_margin] = Layout::vertical([
+            Constraint::Fill(1),
+            Constraint::Percentage(90),
+            Constraint::Fill(1),
+        ])
+        .areas(horizontally_centered_area);
+
+        let [text_area, network_height_area, pool_hashrate_area, pool_miners_area] =
+            Layout::vertical([Constraint::Ratio(1, 4); 4]).areas(centered_area);
+
+        Block::new()
+            .borders(Borders::TOP)
+            .title_top("Motivation")
+            .title_alignment(Alignment::Center)
+            .fg(Color::White)
+            .render(text_area, buf);
+
+        let text_motivaton_area = Rect::new(
+            text_area.x,
+            text_area.y + 1,
+            text_area.width,
+            text_area.height - 1,
+        );
+
+        Paragraph::new("Sigmanauts pool is a DAO-driven, community-run mining pool dedicated to supporting the Ergo ecosystem with extra de-murrage rewards.")
+            .centered().wrap(Wrap {trim: true})
+            .fg(Color::LightYellow)
+            .add_modifier(Modifier::BOLD)
+            .render(text_motivaton_area, buf);
+
+        Block::new()
+            .borders(Borders::TOP)
+            .title_top("Network Hashrate")
+            .title_alignment(Alignment::Center)
+            .fg(Color::White)
+            .render(network_height_area, buf);
+
+        let network_hashrate_center_area = Rect::new(
+            network_height_area.x,
+            network_height_area.y + (network_height_area.height / 2),
+            network_height_area.width,
+            network_height_area.height,
+        );
+
+        Paragraph::new(format!("{} Th/s", 6.42))
+            .centered()
+            .wrap(Wrap { trim: true })
+            .fg(Color::LightYellow)
+            .add_modifier(Modifier::BOLD)
+            .render(network_hashrate_center_area, buf);
+
+        Block::new()
+            .borders(Borders::TOP)
+            .title_top("Pool Hashrate")
+            .title_alignment(Alignment::Center)
+            .fg(Color::White)
+            .render(pool_hashrate_area, buf);
+
+        let pool_hashrate_center_area = Rect::new(
+            pool_hashrate_area.x,
+            pool_hashrate_area.y + (pool_hashrate_area.height / 2),
+            pool_hashrate_area.width,
+            pool_hashrate_area.height,
+        );
+
+        Paragraph::new(format!("{} Gh/s", 6.42))
+            .centered()
+            .wrap(Wrap { trim: true })
+            .fg(Color::LightYellow)
+            .add_modifier(Modifier::BOLD)
+            .render(pool_hashrate_center_area, buf);
+
+        Block::new()
+            .borders(Borders::TOP)
+            .title_top("Pool Miners")
+            .title_alignment(Alignment::Center)
+            .fg(Color::White)
+            .render(pool_miners_area, buf);
+
+        let pool_miners_center_area = Rect::new(
+            pool_miners_area.x,
+            pool_miners_area.y + (pool_miners_area.height / 2),
+            pool_miners_area.width,
+            pool_miners_area.height - 2,
+        );
+
+        Paragraph::new(format!("{}", 42))
+            .centered()
+            .wrap(Wrap { trim: true })
+            .fg(Color::LightYellow)
+            .add_modifier(Modifier::BOLD)
+            .render(pool_miners_center_area, buf);
     }
 
     ///Block title
@@ -168,7 +268,7 @@ impl Home {
     }
     ///Block explaining how to connect
     fn how_to_connect(&self, area: &Rect, buf: &mut Buffer) {
-        Paragraph::new("Under 10 Gh/s:\n 192.168.0.0")
+        Paragraph::new("")
             .block(
                 Block::bordered()
                     .border_set(symbols::border::ROUNDED)
@@ -176,5 +276,55 @@ impl Home {
             )
             .centered()
             .render(*area, buf);
+
+        let [_left, centered, _right] = Layout::horizontal([
+            Constraint::Fill(1),
+            Constraint::Percentage(90),
+            Constraint::Fill(1),
+        ])
+        .areas(*area);
+
+        let [_fill_1, top, bottom, _fill_2] = Layout::vertical([
+            Constraint::Fill(1),
+            Constraint::Percentage(30),
+            Constraint::Percentage(30),
+            Constraint::Fill(1),
+        ])
+        .areas(centered);
+
+        Block::new()
+            .borders(Borders::TOP)
+            .title_top("Under 10 Gh/s")
+            .title_alignment(Alignment::Center)
+            .fg(Color::White)
+            .render(top, buf);
+
+        let top_center_area = Rect::new(top.x, top.y + (top.height / 2), top.width, top.height);
+
+        Paragraph::new("pool.ergo-sig-mining.net:3053")
+            .centered()
+            .fg(Color::LightYellow)
+            .add_modifier(Modifier::BOLD)
+            .render(top_center_area, buf);
+
+        Block::new()
+            .borders(Borders::TOP)
+            .title_top("Over 10 Gh/s")
+            .title_alignment(Alignment::Center)
+            .fg(Color::White)
+            .render(bottom, buf);
+
+        let bottom_center_area = Rect::new(
+            bottom.x,
+            bottom.y + (bottom.height / 2),
+            bottom.width,
+            bottom.height,
+        );
+
+        Paragraph::new("pool.ergo-sig-mining.net:3055")
+            .centered()
+            .fg(Color::LightYellow)
+            .add_modifier(Modifier::BOLD)
+            .render(bottom_center_area, buf);
     }
 }
