@@ -1,7 +1,7 @@
 use ratzilla::ratatui::{
     buffer::Buffer,
     layout::Rect,
-    style::{Color, Style},
+    style::{Color, Style, Stylize},
     text::Line,
     widgets::{Block, BorderType, Paragraph, Tabs, Widget},
     Frame,
@@ -15,14 +15,14 @@ pub struct AppFrame {}
 
 impl AppFrame {
     pub fn render(&self, frame: &mut Frame, selected_tab: &u8) {
-        self.title(&frame.area(), frame.buffer_mut());
+        self.title(&frame.area(), frame.buffer_mut(), selected_tab);
         self.tab_bar(&frame.area(), frame.buffer_mut(), selected_tab);
-        self.nav_controls(&frame.area(), frame.buffer_mut(), selected_tab);
     }
 
-    fn title(&self, area: &Rect, buf: &mut Buffer) {
+    fn title(&self, area: &Rect, buf: &mut Buffer, selected_tab: &u8) {
         Block::bordered()
             .border_type(BorderType::Rounded)
+            .title_bottom(self.nav_controls(selected_tab).centered())
             .render(*area, buf);
 
         Paragraph::new(BANNER).centered().render(*area, buf);
@@ -42,50 +42,40 @@ impl AppFrame {
             .render(tab_area, buf);
     }
 
-    fn nav_controls(&self, area: &Rect, buf: &mut Buffer, selected_tab: &u8) {
+    fn nav_controls(&self, selected_tab: &u8) -> Line<'_> {
         match Tab::new(selected_tab) {
-            Tab::Home => self.home_nav_controls(area, buf),
+            Tab::Home => Line::default().spans(vec![
+                "| ".white(),
+                "[<-]".light_yellow().bold(),
+                " Previous Tab".white(),
+                " | ".white(),
+                "[->]".light_yellow().bold(),
+                " Next Tab".white(),
+                " |".white(),
+            ]),
 
-            Tab::Miner => self.miner_nav_controls(area, buf),
+            Tab::Miner => Line::default().spans(vec![
+                "| ".white(),
+                "[<-]".light_yellow().bold(),
+                " Previous Tab".white(),
+                " | ".white(),
+                "[->]".light_yellow().bold(),
+                " Next Tab".white(),
+                " | ".white(),
+                "[S]".light_yellow().bold(),
+                " Search Address".white(),
+                " |".white(),
+            ]),
 
-            Tab::Info => self.info_nav_controls(area, buf),
+            Tab::Info => Line::default().spans(vec![
+                "| ".white(),
+                "[<-]".light_yellow().bold(),
+                " Previous Tab".white(),
+                " | ".white(),
+                "[->]".light_yellow().bold(),
+                " Next Tab".white(),
+                " |".white(),
+            ]),
         }
-    }
-
-    fn home_nav_controls(&self, area: &Rect, buf: &mut Buffer) {
-        let controls = "| [<-] Previous Tab | [->] Next Tab |";
-
-        let nav_area = Rect::new(
-            (area.width / 2) - (controls.len() as u16 / 2),
-            area.height - 1,
-            controls.len() as u16,
-            1,
-        );
-
-        Line::from(controls).centered().render(nav_area, buf);
-    }
-    fn miner_nav_controls(&self, area: &Rect, buf: &mut Buffer) {
-        let controls = "| [<-] Previous Tab | [->] Next Tab | [S] Search Address |";
-
-        let nav_area = Rect::new(
-            (area.width / 2) - (controls.len() as u16 / 2),
-            area.height - 1,
-            controls.len() as u16,
-            1,
-        );
-
-        Line::from(controls).centered().render(nav_area, buf);
-    }
-    fn info_nav_controls(&self, area: &Rect, buf: &mut Buffer) {
-        let controls = "| [<-] Previous Tab | [->] Next Tab |";
-
-        let nav_area = Rect::new(
-            (area.width / 2) - (controls.len() as u16 / 2),
-            area.height - 1,
-            controls.len() as u16,
-            1,
-        );
-
-        Line::from(controls).centered().render(nav_area, buf);
     }
 }
