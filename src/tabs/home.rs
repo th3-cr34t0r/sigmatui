@@ -149,8 +149,8 @@ impl Home {
             ])
             .areas(centered_area);
 
-        Block::new()
-            .borders(Borders::TOP)
+        Block::bordered()
+            .border_type(BorderType::Rounded)
             .title_top("Motivation")
             .title_alignment(Alignment::Center)
             .fg(Color::White)
@@ -159,7 +159,7 @@ impl Home {
         let text_motivaton_area = Rect::new(
             text_area.x,
             text_area.y + (text_area.height / 3),
-            text_area.width,
+            text_area.width - 2,
             text_area.height - 2,
         );
 
@@ -170,43 +170,36 @@ impl Home {
             .wrap(Wrap { trim: true })
             .render(text_motivaton_area, buf);
 
-        let network_hashrate_info = Line::default().spans(vec![
-            "Network Hashrate - ".white(),
-            format!("{} Th/s", 6.52).light_yellow().bold(),
-        ]);
-        Paragraph::new("")
+        let network_hashrate_info =
+            Line::default().spans(vec![format!("{} Th/s", 6.52).light_yellow().bold()]);
+        Paragraph::new(network_hashrate_info)
             .block(
                 Block::new()
-                    .borders(Borders::TOP)
-                    .title_top(network_hashrate_info)
+                    .title_top("Network Hashrate")
                     .title_alignment(Alignment::Center),
             )
+            .centered()
             .render(network_height_area, buf);
 
-        let pool_hashrate_info = Line::default().spans(vec![
-            "Pool Hashrate - ".white(),
-            format!("{} Gh/s", 95.52).light_yellow().bold(),
-        ]);
-        Paragraph::new("")
+        let pool_hashrate_info =
+            Line::default().spans(vec![format!("{} Gh/s", 66.52).light_yellow().bold()]);
+        Paragraph::new(pool_hashrate_info)
             .block(
                 Block::new()
-                    .borders(Borders::TOP)
-                    .title_top(pool_hashrate_info)
+                    .title_top("Pool Hashrate")
                     .title_alignment(Alignment::Center),
             )
+            .centered()
             .render(pool_hashrate_area, buf);
 
-        let pool_miners_info = Line::default().spans(vec![
-            "Pool Miners - ".white(),
-            format!("{}", 62).light_yellow().bold(),
-        ]);
-        Paragraph::new("")
+        let pool_miners_info = Line::default().spans(vec![format!("{}", 65).light_yellow().bold()]);
+        Paragraph::new(pool_miners_info)
             .block(
                 Block::new()
-                    .borders(Borders::TOP)
-                    .title_top(pool_miners_info)
+                    .title_top("Pool Miners")
                     .title_alignment(Alignment::Center),
             )
+            .centered()
             .render(pool_miners_area, buf);
     }
 

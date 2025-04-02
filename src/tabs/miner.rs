@@ -4,7 +4,7 @@ use ratzilla::ratatui::{
     buffer::Buffer,
     layout::{Alignment, Constraint, Direction, Layout, Rect},
     style::{Color, Style, Stylize},
-    symbols::Marker,
+    symbols::{self, Marker},
     text::Line,
     widgets::{
         Axis, Block, BorderType, Chart, Clear, Dataset, GraphType, Paragraph, Row, Table, Widget,
@@ -117,9 +117,106 @@ impl Miner {
     }
 
     fn miner_stats(&self, area: &Rect, buf: &mut Buffer) {
-        Paragraph::new("")
-            .block(Block::bordered().border_type(BorderType::Rounded))
+        Block::bordered()
+            .border_type(BorderType::Rounded)
+            .title_top("Miner Stats")
             .render(*area, buf);
+
+        let [_left_margin, centered_area, _right_margin] = Layout::horizontal([
+            Constraint::Fill(1),
+            Constraint::Percentage(90),
+            Constraint::Fill(1),
+        ])
+        .areas(*area);
+
+        let [_top_margin, centered_area, _bottom_margin] = Layout::vertical([
+            Constraint::Fill(1),
+            Constraint::Percentage(80),
+            Constraint::Fill(1),
+        ])
+        .areas(centered_area);
+
+        let [left_area, right_area] =
+            Layout::horizontal([Constraint::Percentage(50), Constraint::Percentage(50)])
+                .areas(centered_area);
+
+        let [left_area_1, left_area_2, left_area_3, left_area_4] =
+            Layout::vertical([Constraint::Ratio(1, 4); 4]).areas(left_area);
+
+        let [right_area_1, right_area_2, right_area_3, right_area_4] =
+            Layout::vertical([Constraint::Ratio(1, 4); 4]).areas(right_area);
+
+        Paragraph::new(Line::default().spans(vec![format!("{}%", 33.6).light_yellow().bold()]))
+            .block(
+                Block::new()
+                    .title_top("Participation")
+                    .title_alignment(Alignment::Center),
+            )
+            .centered()
+            .render(left_area_1, buf);
+
+        Paragraph::new(Line::default().spans(vec![format!("{}%", 33.6).light_yellow().bold()]))
+            .block(
+                Block::new()
+                    .title_top("Participation")
+                    .title_alignment(Alignment::Center),
+            )
+            .centered()
+            .render(left_area_2, buf);
+
+        Paragraph::new(Line::default().spans(vec![format!("{}%", 33.6).light_yellow().bold()]))
+            .block(
+                Block::new()
+                    .title_top("Participation")
+                    .title_alignment(Alignment::Center),
+            )
+            .centered()
+            .render(left_area_3, buf);
+
+        Paragraph::new(Line::default().spans(vec![format!("{}%", 33.6).light_yellow().bold()]))
+            .block(
+                Block::new()
+                    .title_top("Participation")
+                    .title_alignment(Alignment::Center),
+            )
+            .centered()
+            .render(left_area_4, buf);
+
+        Paragraph::new(Line::default().spans(vec![format!("{}%", 33.6).light_yellow().bold()]))
+            .block(
+                Block::new()
+                    .title_top("Participation")
+                    .title_alignment(Alignment::Center),
+            )
+            .centered()
+            .render(right_area_1, buf);
+
+        Paragraph::new(Line::default().spans(vec![format!("{}%", 33.6).light_yellow().bold()]))
+            .block(
+                Block::new()
+                    .title_top("Participation")
+                    .title_alignment(Alignment::Center),
+            )
+            .centered()
+            .render(right_area_2, buf);
+
+        Paragraph::new(Line::default().spans(vec![format!("{}%", 33.6).light_yellow().bold()]))
+            .block(
+                Block::new()
+                    .title_top("Participation")
+                    .title_alignment(Alignment::Center),
+            )
+            .centered()
+            .render(right_area_3, buf);
+
+        Paragraph::new(Line::default().spans(vec![format!("{}%", 33.6).light_yellow().bold()]))
+            .block(
+                Block::new()
+                    .title_top("Participation")
+                    .title_alignment(Alignment::Center),
+            )
+            .centered()
+            .render(right_area_4, buf);
     }
 
     fn miner_middle(&self, area: &Rect, buf: &mut Buffer) {
