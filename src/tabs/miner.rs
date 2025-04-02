@@ -26,9 +26,21 @@ impl Miner {
             Layout::vertical([Constraint::Percentage(50), Constraint::Percentage(50)]).areas(area);
         let [workers_area, hashrate_chart_area] =
             Layout::horizontal([Constraint::Percentage(33), Constraint::Fill(1)]).areas(top_area);
+        let [miner_stats_area, middle_area, right_area] = Layout::horizontal([
+            Constraint::Percentage(33),
+            Constraint::Fill(1),
+            Constraint::Percentage(33),
+        ])
+        .areas(bottom_area);
 
+        // top part
         self.workers(&workers_area, frame.buffer_mut());
         self.hashrate_chart(&hashrate_chart_area, frame.buffer_mut());
+
+        // bottom part
+        self.miner_stats(&miner_stats_area, frame.buffer_mut());
+        self.miner_middle(&middle_area, frame.buffer_mut());
+        self.miner_right(&right_area, frame.buffer_mut());
 
         self.popup_address_input(&area, frame.buffer_mut());
     }
@@ -104,6 +116,23 @@ impl Miner {
             .render(*area, buf);
     }
 
+    fn miner_stats(&self, area: &Rect, buf: &mut Buffer) {
+        Paragraph::new("")
+            .block(Block::bordered().border_type(BorderType::Rounded))
+            .render(*area, buf);
+    }
+
+    fn miner_middle(&self, area: &Rect, buf: &mut Buffer) {
+        Paragraph::new("")
+            .block(Block::bordered().border_type(BorderType::Rounded))
+            .render(*area, buf);
+    }
+
+    fn miner_right(&self, area: &Rect, buf: &mut Buffer) {
+        Paragraph::new("")
+            .block(Block::bordered().border_type(BorderType::Rounded))
+            .render(*area, buf);
+    }
     fn popup_address_input(&self, area: &Rect, buf: &mut Buffer) {
         if self.popup {
             let popup_area: [Rect; 3] = Layout::vertical([
@@ -121,11 +150,24 @@ impl Miner {
             .areas(popup_area[1]);
 
             Clear.render(popup_area, buf);
+
+            let nav_controls = Line::default()
+                .spans(vec![
+                    "| ".white(),
+                    "[P]".light_red().bold(),
+                    " Paste".white(),
+                    " | ".white(),
+                    "[Enter]".light_red().bold(),
+                    " Search".white(),
+                    " |".white(),
+                ])
+                .centered();
+
             Paragraph::new(self.address.borrow().as_str())
                 .block(
                     Block::bordered()
                         .title_top("Input Miner Address")
-                        .title_bottom(Line::from("| [P] Paste | [Enter] Search |").centered()),
+                        .title_bottom(nav_controls),
                 )
                 .on_red()
                 .centered()
